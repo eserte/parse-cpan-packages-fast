@@ -178,8 +178,10 @@ use warnings;
 	Parse::CPAN::Packages::Fast::Distribution->new($dist);
     }
 
-# XXX prefix
-#  print $d->prefix, "\n";    # L/LB/LBROCARD/Acme-Colour-1.00.tar.gz
+    sub prefix {
+	my $self = shift;
+	$self->distribution->prefix;
+    }
 
     sub DESTROY {
 	my $self = shift;
@@ -196,7 +198,12 @@ use warnings;
 
     use base qw(CPAN::DistnameInfo);
     
-# prefix
+    sub prefix {
+	my $self = shift;
+	my $prefix = $self->pathname;
+	$prefix =~ s{^authors/id/}{};
+	$prefix;
+    }
 
     # Methods found in original Parse::CPAN::Packages::Distribution
     sub contains {
