@@ -8,4 +8,6 @@ WriteMakefile(NAME => 'Parse::CPAN::Packages::Fast',
 			     'CPAN::DistnameInfo' => 0,
 			     'PerlIO::gzip'       => 0,
 			   },
+	      ($ExtUtils::MakeMaker::VERSION >= 6.54 ?
+	       (META_ADD => { resources => { repository => 'git://github.com/eserte/parse-cpan-packages-fast.git' } }) : ()),
 	     );
