@@ -20,7 +20,7 @@ use warnings;
 {
     package Parse::CPAN::Packages::Fast;
 
-    our $VERSION = '0.01';
+    our $VERSION = '0.02';
 
     use PerlIO::gzip;
     use version;
@@ -80,9 +80,20 @@ use warnings;
 	keys %{ $self->{pkg_ver} };
     }
 
+    sub package_count {
+	my $self = shift;
+	scalar keys %{ $self->{pkg_ver} };
+    }
+
     sub distributions {
 	my $self = shift;
 	map { Parse::CPAN::Packages::Fast::Distribution->new($_) } keys %{ $self->{dist_to_pkgs} };
+    }
+
+    sub distribution_count {
+	my $self = shift;
+	my @dists = $self->distributions;
+	scalar @dists;
     }
 
     sub latest_distribution {
@@ -127,6 +138,12 @@ use warnings;
 	}
 	values %latest_dist;
     }
+
+    sub latest_distribution_count {
+	my $self = shift;
+	my @dists = $self->latest_distributions;
+	scalar @dists;
+    }
 }
 
 ######################################################################
@@ -134,6 +151,8 @@ use warnings;
 {
 
     package Parse::CPAN::Packages::Fast::Package;
+
+    our $VERSION = $Parse::CPAN::Packages::Fast::VERSION;
 
     # Use inside-out technique for this member, to hide it in dumps etc.
     my %obj_to_packages;
@@ -159,6 +178,9 @@ use warnings;
 	Parse::CPAN::Packages::Fast::Distribution->new($dist);
     }
 
+# XXX prefix
+#  print $d->prefix, "\n";    # L/LB/LBROCARD/Acme-Colour-1.00.tar.gz
+
     sub DESTROY {
 	my $self = shift;
 	delete $obj_to_packages{$self};
@@ -170,8 +192,22 @@ use warnings;
 {
     package Parse::CPAN::Packages::Fast::Distribution;
 
+    our $VERSION = $Parse::CPAN::Packages::Fast::VERSION;
+
     use base qw(CPAN::DistnameInfo);
     
+# prefix
+
+    # Methods found in original Parse::CPAN::Packages::Distribution
+    sub contains {
+	die "NYI";
+    }
+
+    sub add_package {
+	die "NYI";
+    }
+
+    # Would be nice to have:
     sub is_latest_distribution {
 	die "NYI";
     }
@@ -213,8 +249,8 @@ Notable differences are
 
 =over
 
-=item * is_latest_distribution of
-Parse::CPAN::Packages::Fast::Distribution is not implemented
+=item * The methods contains and add_package of
+Parse::CPAN::Packages::Fast::Distribution are not implemented
 
 =item * Parse::CPAN::Packages::Fast::Distribution is really a
 L<CPAN::DistnameInfo> (but this one is compatible with
