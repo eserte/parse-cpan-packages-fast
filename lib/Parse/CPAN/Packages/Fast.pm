@@ -182,3 +182,59 @@ use warnings;
 1;
 
 __END__
+
+=head1 NAME
+
+Parse::CPAN::Packages::Fast - parse CPAN's package index
+
+=head1 SYNOPSIS
+
+    use Parse::CPAN::Packages::Fast;
+
+    my $p = Parse::CPAN::Packages::Fast->new;
+    ## or alternatively, if CPAN.pm is not configured:
+    # my $p = Parse::CPAN::Packages::Fast->new("/path/to/02packages.details.txt.gz");
+
+    my $m = $p->package("Kwalify");
+    # $m is a Parse::CPAN::Packages::Fast::Package object
+    print $m->package, "\n";   # Kwalify
+    print $m->version, "\n";   # 1.21
+
+    my $d = $m->distribution;
+    # $d is a Parse::CPAN::Packages::Fast::Distribution object
+    print $d->dist,    "\n";   # Kwalify
+    print $d->version, "\n";   # 1.21
+
+=head1 DESCRIPTION
+
+This is a largely API compatible rewrite of L<Parse::CPAN::Packages>.
+
+Notable differences are
+
+=over
+
+=item * is_latest_distribution of
+Parse::CPAN::Packages::Fast::Distribution is not implemented
+
+=item * Parse::CPAN::Packages::Fast::Distribution is really a
+L<CPAN::DistnameInfo> (but this one is compatible with
+Parse::CPAN::Packages::Distribution>
+
+=back
+
+=head2 WHY?
+
+Calling C<Parse::CPAN::Packages>' constructor is quite slow and takes
+about 10 seconds on my machine. In contrast, the reimplementation just
+takes a second.
+
+I did some benchmarking of the original module and found no obvious
+weak point to speed it up. Moose is used here, but does not seem to
+cause the problem. I suspect that the real problem is just heavy use
+of method calls.
+
+=head1 SEE ALSO
+
+L<Parse::CPAN::Packages>, L<CPAN::DistnameInfo>.
+
+=cut
