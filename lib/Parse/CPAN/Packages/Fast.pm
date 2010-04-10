@@ -1,0 +1,184 @@
+#!/usr/bin/perl
+# -*- perl -*-
+
+#
+# Author: Slaven Rezic
+#
+# Copyright (C) 2009,2010 Slaven Rezic. All rights reserved.
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+#
+# Mail: slaven@rezic.de
+# WWW:  http://www.rezic.de/eserte/
+#
+
+use strict;
+use warnings;
+
+######################################################################
+
+{
+    package Parse::CPAN::Packages::Fast;
+
+    our $VERSION = '0.01';
+
+    use PerlIO::gzip;
+    use version;
+
+    sub _default_packages_file {
+	my($class) = @_;
+	require CPAN;
+	no warnings 'once';
+	local $CPAN::Be_Silent = 1;
+	CPAN::HandleConfig->load;
+	my $packages_file = $CPAN::Config->{keep_source_where} . "/modules/02packages.details.txt.gz";
+	$packages_file;
+    }
+
+    sub new {
+	my($class, $packages_file) = @_;
+
+	if (!$packages_file) {
+	    $packages_file = $class->_default_packages_file;
+	    if (!$packages_file) {
+		die "packages file not specified and cannot be determined from CPAN.pm configuration";
+	    }
+	}
+
+	my %pkg_to_dist;
+	my %dist_to_pkgs;
+	my %pkg_ver;
+
+	open my $FH, "<:gzip", $packages_file
+	    or die "Can't open $packages_file: $!";
+	# overread header
+	while(<$FH>) {
+	    last if /^$/;
+	}
+	# read payload
+	while(<$FH>) {
+	    my($pkg, $ver, $dist) = split;
+	    $pkg_to_dist{$pkg} = $dist;
+	    $pkg_ver{$pkg} = $ver;
+	    push @{ $dist_to_pkgs{$dist} }, $pkg;
+	}
+	
+	bless { pkg_to_dist  => \%pkg_to_dist,
+		dist_to_pkgs => \%dist_to_pkgs,
+		pkg_ver      => \%pkg_ver,
+	      }, $class;
+    }
+
+    sub package {
+	my($self, $package_name) = @_;
+	die "Package $package_name does not exist" if !exists $self->{pkg_ver}{$package_name}; # XXX die or not?
+	Parse::CPAN::Packages::Fast::Package->new($package_name, $self);
+    }
+
+    sub packages {
+	my $self = shift;
+	keys %{ $self->{pkg_ver} };
+    }
+
+    sub distributions {
+	my $self = shift;
+	map { Parse::CPAN::Packages::Fast::Distribution->new($_) } keys %{ $self->{dist_to_pkgs} };
+    }
+
+    sub latest_distribution {
+	my($self, $distribution_name) = @_;
+	my @candidates;
+	for my $candidate (keys %{ $self->{dist_to_pkgs} }) {
+	    if ($candidate =~ m{/\Q$distribution_name}) {
+		my $d = Parse::CPAN::Packages::Fast::Distribution->new($candidate);
+		if ($d->dist eq $distribution_name) {
+		    push @candidates, $d;
+		}
+	    }
+	}
+	return if !@candidates; # XXX die or not?
+	my $best_candidate = pop @candidates;
+	my $best_candidate_version = version->new($best_candidate->version);
+	for my $candidate (@candidates) {
+	    my $this_version = version->new($candidate->version);
+	    if ($best_candidate_version < $this_version) {
+		$best_candidate = $candidate;
+		$best_candidate_version = $this_version;
+	    }
+	}
+	$best_candidate;
+    }
+
+    sub latest_distributions {
+	my $self = shift;
+	my %latest_dist;
+	for my $pathname (keys %{ $self->{dist_to_pkgs} }) {
+	    my $d = Parse::CPAN::Packages::Fast::Distribution->new($pathname);
+	    my $dist = $d->dist;
+	    next if !defined $dist;
+	    if (!exists $latest_dist{$dist}) {
+		$latest_dist{$dist} = $d;
+	    } else {
+		no warnings;
+		if (eval { version->new($latest_dist{$dist}->version) < version->new($d->version) }) {
+		    $latest_dist{$dist} = $d;
+		}
+	    }
+	}
+	values %latest_dist;
+    }
+}
+
+######################################################################
+
+{
+
+    package Parse::CPAN::Packages::Fast::Package;
+
+    # Use inside-out technique for this member, to hide it in dumps etc.
+    my %obj_to_packages;
+
+    sub new {
+	my($class, $package_name, $packages) = @_;
+	my $self = bless { package  => $package_name,
+			   version  => $packages->{pkg_ver}{$package_name},
+			 }, 'Parse::CPAN::Packages::Fast::Package';
+	$obj_to_packages{$self} = $packages;
+	$self;
+    }
+
+    for my $method (qw(package version)) {
+	no strict 'refs';
+	*{$method} = sub { shift->{$method} };
+    }
+
+    sub distribution {
+	my $self = shift;
+	my $packages = $obj_to_packages{$self};
+	my $dist = $packages->{pkg_to_dist}->{$self->package};
+	Parse::CPAN::Packages::Fast::Distribution->new($dist);
+    }
+
+    sub DESTROY {
+	my $self = shift;
+	delete $obj_to_packages{$self};
+    }
+}
+
+######################################################################
+
+{
+    package Parse::CPAN::Packages::Fast::Distribution;
+
+    use base qw(CPAN::DistnameInfo);
+    
+    sub is_latest_distribution {
+	die "NYI";
+    }
+}
+
+######################################################################
+
+1;
+
+__END__
