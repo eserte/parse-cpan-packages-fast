@@ -20,7 +20,7 @@ use warnings;
 {
     package Parse::CPAN::Packages::Fast;
 
-    our $VERSION = '0.02';
+    our $VERSION = '0.03';
 
     use PerlIO::gzip;
     use version;

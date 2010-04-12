@@ -8,9 +8,9 @@ plan tests => 1 + $real_tests;
 
 use_ok 'Parse::CPAN::Packages::Fast';
 
-my $packages_file = Parse::CPAN::Packages::Fast->_default_packages_file;
+my $packages_file = eval { Parse::CPAN::Packages::Fast->_default_packages_file };
 SKIP: {
-    skip "Cannot get the default packages index file", $real_tests
+    skip "Cannot get default CPAN packages index file", $real_tests
 	if !-r $packages_file || -z $packages_file;
 
     my $pcp = Parse::CPAN::Packages::Fast->new;
