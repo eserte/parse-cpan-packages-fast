@@ -1,5 +1,6 @@
+/.prove
 /Makefile
 /Makefile.old
+/Parse-CPAN-Packages-Fast-*.tar.gz
 /blib
 /pm_to_blib
-/Parse-CPAN-Packages-Fast-*.tar.gz
