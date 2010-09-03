@@ -1,0 +1,13 @@
+Revision history for Perl extension Parse::CPAN::Packages::Fast
+
+0.04
+	- implemented contains method
+
+0.03
+	- protect from test failures because
+
+0.02
+	- implemented prefix, *_count methods
+
+0.01
+	- initial release

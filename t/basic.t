@@ -3,7 +3,7 @@
 use strict;
 use Test::More;
 
-my $real_tests = 13;
+my $real_tests = 15;
 plan tests => 1 + $real_tests;
 
 use_ok 'Parse::CPAN::Packages::Fast';
@@ -29,10 +29,15 @@ SKIP: {
     is($dist->dist, 'Kwalify');
     like($dist->prefix, qr{^S/SR/SREZIC/Kwalify-});
 
-    ok($pcp->latest_distribution('Kwalify'));
-    ok($pcp->latest_distribution('Catalyst-Runtime'));
+    my @dist_packages = $dist->contains;
+    cmp_ok(@dist_packages, ">=", 1, "At least one package found in distribution");
+    my($kwalify_package) = grep { $_->package eq 'Kwalify' } @dist_packages;
+    isa_ok($kwalify_package, 'Parse::CPAN::Packages::Fast::Package', 'Found Kwalify package in dist');
+
+    ok($pcp->latest_distribution('Kwalify'), 'Find latest Kwalify');
+    ok($pcp->latest_distribution('Catalyst-Runtime'), 'Find latest Catalyst-Runtime');
 
     my @dists = map { $_->dist } $pcp->latest_distributions;
-    cmp_ok(scalar(@dists), ">", 10000);
+    cmp_ok(scalar(@dists), ">", 10000, 'Reasonable count of latest distribution');
     is($pcp->latest_distribution_count, scalar(@dists));
 }

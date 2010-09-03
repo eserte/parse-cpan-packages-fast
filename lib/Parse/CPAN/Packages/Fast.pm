@@ -15,12 +15,14 @@
 use strict;
 use warnings;
 
+use CPAN::DistnameInfo ();
+
 ######################################################################
 
 {
     package Parse::CPAN::Packages::Fast;
 
-    our $VERSION = '0.03';
+    our $VERSION = '0.04';
 
     use PerlIO::gzip;
     use version;
@@ -85,9 +87,15 @@ use warnings;
 	scalar keys %{ $self->{pkg_ver} };
     }
 
+    sub distribution {
+	my($self, $distribution_name) = @_;
+	die "Distribution $distribution_name does not exist" if !exists $self->{dist_to_pkgs}{$distribution_name}; # XXX die or not?
+	Parse::CPAN::Packages::Fast::Distribution->new($distribution_name, $self);
+    }
+
     sub distributions {
 	my $self = shift;
-	map { Parse::CPAN::Packages::Fast::Distribution->new($_) } keys %{ $self->{dist_to_pkgs} };
+	map { Parse::CPAN::Packages::Fast::Distribution->new($_, $self) } keys %{ $self->{dist_to_pkgs} };
     }
 
     sub distribution_count {
@@ -101,7 +109,10 @@ use warnings;
 	my @candidates;
 	for my $candidate (keys %{ $self->{dist_to_pkgs} }) {
 	    if ($candidate =~ m{/\Q$distribution_name}) {
-		my $d = Parse::CPAN::Packages::Fast::Distribution->new($candidate);
+		# Possibly pure CPAN::DistnameInfo is somewhat faster
+		# than Parse::CPAN::Packages::Fast::Distribution (no
+		# inside-out handling, no additional DESTROY)
+		my $d = CPAN::DistnameInfo->new($candidate);
 		if ($d->dist eq $distribution_name) {
 		    push @candidates, $d;
 		}
@@ -117,14 +128,14 @@ use warnings;
 		$best_candidate_version = $this_version;
 	    }
 	}
-	$best_candidate;
+	Parse::CPAN::Packages::Fast::Distribution->new($best_candidate->pathname, $self);
     }
 
     sub latest_distributions {
 	my $self = shift;
 	my %latest_dist;
 	for my $pathname (keys %{ $self->{dist_to_pkgs} }) {
-	    my $d = Parse::CPAN::Packages::Fast::Distribution->new($pathname);
+	    my $d = Parse::CPAN::Packages::Fast::Distribution->new($pathname, $self);
 	    my $dist = $d->dist;
 	    next if !defined $dist;
 	    if (!exists $latest_dist{$dist}) {
@@ -175,7 +186,7 @@ use warnings;
 	my $self = shift;
 	my $packages = $obj_to_packages{$self};
 	my $dist = $packages->{pkg_to_dist}->{$self->package};
-	Parse::CPAN::Packages::Fast::Distribution->new($dist);
+	Parse::CPAN::Packages::Fast::Distribution->new($dist, $packages);
     }
 
     sub prefix {
@@ -197,6 +208,16 @@ use warnings;
     our $VERSION = $Parse::CPAN::Packages::Fast::VERSION;
 
     use base qw(CPAN::DistnameInfo);
+
+    # Use inside-out technique for this member, to hide it in dumps etc.
+    my %obj_to_packages;
+
+    sub new {
+	my($class, $pathname, $packages) = @_;
+	my $self = $class->SUPER::new($pathname);
+	$obj_to_packages{$self} = $packages;
+	$self;
+    }
     
     sub prefix {
 	my $self = shift;
@@ -205,11 +226,18 @@ use warnings;
 	$prefix;
     }
 
-    # Methods found in original Parse::CPAN::Packages::Distribution
     sub contains {
-	die "NYI";
+	my $self = shift;
+	my $packages = $obj_to_packages{$self};
+	map { Parse::CPAN::Packages::Fast::Package->new($_, $packages) } @{ $packages->{dist_to_pkgs}{$self->pathname} };
     }
 
+    sub DESTROY {
+	my $self = shift;
+	delete $obj_to_packages{$self};
+    }
+
+    # Methods found in original Parse::CPAN::Packages::Distribution
     sub add_package {
 	die "NYI";
     }
@@ -256,12 +284,19 @@ Notable differences are
 
 =over
 
-=item * The methods contains and add_package of
-Parse::CPAN::Packages::Fast::Distribution are not implemented
+=item * The method add_package of
+Parse::CPAN::Packages::Fast::Distribution is not implemented
 
 =item * Parse::CPAN::Packages::Fast::Distribution is really a
 L<CPAN::DistnameInfo> (but this one is compatible with
 Parse::CPAN::Packages::Distribution>
+
+=item * A Parse::CPAN::Packages::Fast::Distribution object does not
+have its packages included in the data structure, but it's necessary
+to use the C<contains> method. Likewise, a
+Parse::CPAN::Packages::Fast::Package object does not include the
+containing distribution in the data structure, but it's necessary to
+use the C<distribution> method.
 
 =back
 
