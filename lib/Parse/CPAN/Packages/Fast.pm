@@ -311,6 +311,9 @@ weak point to speed it up. Moose is used here, but does not seem to
 cause the problem. I suspect that the real problem is just heavy use
 of method calls.
 
+Also, this module does not have problems with circular references like
+the original. See L<Parse::CPAN::Packages/BUGS>.
+
 =head1 SEE ALSO
 
 L<Parse::CPAN::Packages>, L<CPAN::DistnameInfo>.
