@@ -2,16 +2,17 @@
 use 5.006;
 use ExtUtils::MakeMaker;
 
-eval {
-    if ((getpwuid($<))[0] eq 'eserte' && $ExtUtils::MakeMaker::VERSION < 6.54) {
-	warn <<EOF;
-**********************************************************************
-* WARNING:
-* ExtUtils::MakeMaker too old. META.yml will be imcomplete
-**********************************************************************
+my $eumm_recent_enough = $ExtUtils::MakeMaker::VERSION >= 6.54;
+
+if (!$eumm_recent_enough) {
+    *MY::dist_core = sub {
+	<<'EOF';
+dist :
+	$(NOECHO) $(ECHO) "Sorry, use a newer EUMM!"
+
 EOF
-    }
-};
+    };
+}
 
 WriteMakefile(NAME => 'Parse::CPAN::Packages::Fast',
 	      VERSION_FROM => 'lib/Parse/CPAN/Packages/Fast.pm',
@@ -19,6 +20,6 @@ WriteMakefile(NAME => 'Parse::CPAN::Packages::Fast',
 			     'CPAN::DistnameInfo' => 0,
 			     'PerlIO::gzip'       => 0,
 			   },
-	      ($ExtUtils::MakeMaker::VERSION >= 6.54 ?
+	      ($eumm_recent_enough ?
 	       (META_ADD => { resources => { repository => 'git://github.com/eserte/parse-cpan-packages-fast.git' } }) : ()),
 	     );
