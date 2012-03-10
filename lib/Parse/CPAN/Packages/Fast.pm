@@ -73,7 +73,7 @@ use CPAN::DistnameInfo ();
 
     sub package {
 	my($self, $package_name) = @_;
-	die "Package $package_name does not exist" if !exists $self->{pkg_ver}{$package_name}; # XXX die or not?
+	return undef if !exists $self->{pkg_ver}{$package_name};
 	Parse::CPAN::Packages::Fast::Package->new($package_name, $self);
     }
 
