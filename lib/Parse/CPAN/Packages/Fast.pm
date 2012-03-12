@@ -4,7 +4,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2009,2010 Slaven Rezic. All rights reserved.
+# Copyright (C) 2009,2010,2012 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -22,7 +22,7 @@ use CPAN::DistnameInfo ();
 {
     package Parse::CPAN::Packages::Fast;
 
-    our $VERSION = '0.04';
+    our $VERSION = '0.05';
 
     use PerlIO::gzip;
     use version;
