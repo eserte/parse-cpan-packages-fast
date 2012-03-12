@@ -1,5 +1,9 @@
 Revision history for Perl extension Parse::CPAN::Packages::Fast
 
+0.05
+	- don't die when asked for nonexisting packages
+	  (patch by Dennis Kaarsemaker)
+
 0.04
 	- implemented contains method
 
