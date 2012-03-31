@@ -22,7 +22,8 @@ use CPAN::DistnameInfo ();
 {
     package Parse::CPAN::Packages::Fast;
 
-    our $VERSION = '0.05';
+    our $VERSION = '0.05_50';
+    $VERSION =~ s{_}{};
 
     use PerlIO::gzip;
     use CPAN::Version ();
