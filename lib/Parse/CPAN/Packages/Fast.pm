@@ -27,7 +27,9 @@ use CPAN::DistnameInfo ();
     use PerlIO::gzip;
     use CPAN::Version ();
 
-    sub _default_packages_file {
+    # Note: this function is possibly interactive, i.e. if CPAN.pm was
+    # never configured, or if CPAN's Config.pm needs reconfiguration.
+    sub _default_packages_file_interactive {
 	my($class) = @_;
 	require CPAN;
 	no warnings 'once';
@@ -36,6 +38,36 @@ use CPAN::DistnameInfo ();
 	my $packages_file = $CPAN::Config->{keep_source_where} . "/modules/02packages.details.txt.gz";
 	$packages_file;
     }
+
+    # Note: this function is guaranteed to be non-interactive, but it
+    # is using just default locations to look at the CPAN config, or
+    # the 02packages files.
+    sub _default_packages_file_batch {
+	my($class) = @_;
+
+	my $home_cpandir = "$ENV{HOME}/.cpan";
+	if (!$INC{"CPAN/MyConfig.pm"}) {
+	    no warnings 'uninitialized'; # HOME may be uninitialized on some systems e.g. Windows
+	    my $home_myconfig = "$home_cpandir/CPAN/MyConfig.pm";
+	    if (-r $home_myconfig) {
+		local @INC = ($home_cpandir);
+		eval { require "CPAN::MyConfig" };
+	    }
+	}
+	if ($INC{"CPAN/MyConfig.pm"} && $CPAN::Config->{keep_source_where}) {
+	    return $CPAN::Config->{keep_source_where} . "/modules/02packages.details.txt.gz";
+	}
+
+	# Cannot find a usable CPAN::MyConfig, try a default location
+	my $packages_file = "$home_cpandir/sources/modules/02packages.details.txt.gz";
+	if (-r $packages_file && -s $packages_file) {
+	    return $packages_file;
+	}
+
+	undef;
+    }
+
+    *_default_packages_file = \&_default_packages_file_interactive;
 
     sub new {
 	my($class, $packages_file) = @_;
@@ -262,9 +294,9 @@ Parse::CPAN::Packages::Fast - parse CPAN's package index
 
     use Parse::CPAN::Packages::Fast;
 
-    my $p = Parse::CPAN::Packages::Fast->new;
-    ## or alternatively, if CPAN.pm is not configured:
-    # my $p = Parse::CPAN::Packages::Fast->new("/path/to/02packages.details.txt.gz");
+    my $p = Parse::CPAN::Packages::Fast->new("/path/to/02packages.details.txt.gz");
+    ## Or alternatively, if CPAN.pm is configured
+    #my $p = Parse::CPAN::Packages::Fast->new;
 
     my $m = $p->package("Kwalify");
     # $m is a Parse::CPAN::Packages::Fast::Package object
@@ -297,6 +329,12 @@ to use the C<contains> method. Likewise, a
 Parse::CPAN::Packages::Fast::Package object does not include the
 containing distribution in the data structure, but it's necessary to
 use the C<distribution> method.
+
+=item * The C<new> constructor may be called without the path to the
+C<02packages.details.txt> file. In this case L<CPAN.pm|CPAN>'s logic
+is used to find an existing packages file. Note that this might be
+interactive (i.e. if CPAN.pm was never configured, or needs
+reconfiguration), so don't do this in batch systems.
 
 =back
 
