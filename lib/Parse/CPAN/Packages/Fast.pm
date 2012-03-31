@@ -108,11 +108,12 @@ use CPAN::DistnameInfo ();
 	my($self, $distribution_name) = @_;
 	my @candidates;
 	for my $candidate (keys %{ $self->{dist_to_pkgs} }) {
-	    if ($candidate =~ m{/\Q$distribution_name}) {
+	    if ($candidate =~ m{^./../.*/\Q$distribution_name}) {
 		# Possibly pure CPAN::DistnameInfo is somewhat faster
 		# than Parse::CPAN::Packages::Fast::Distribution (no
 		# inside-out handling, no additional DESTROY)
 		my $d = CPAN::DistnameInfo->new($candidate);
+		no warnings 'uninitialized'; # Some distributions have no parseable dist name
 		if ($d->dist eq $distribution_name) {
 		    push @candidates, $d;
 		}
