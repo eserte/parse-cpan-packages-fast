@@ -25,7 +25,7 @@ use CPAN::DistnameInfo ();
     our $VERSION = '0.05';
 
     use PerlIO::gzip;
-    use version;
+    use CPAN::Version ();
 
     sub _default_packages_file {
 	my($class) = @_;
@@ -120,10 +120,10 @@ use CPAN::DistnameInfo ();
 	}
 	return if !@candidates; # XXX die or not?
 	my $best_candidate = pop @candidates;
-	my $best_candidate_version = version->new($best_candidate->version);
+	my $best_candidate_version = $best_candidate->version;
 	for my $candidate (@candidates) {
-	    my $this_version = version->new($candidate->version);
-	    if ($best_candidate_version < $this_version) {
+	    my $this_version = $candidate->version;
+	    if (CPAN::Version->vlt($best_candidate_version, $this_version)) {
 		$best_candidate = $candidate;
 		$best_candidate_version = $this_version;
 	    }
@@ -141,8 +141,7 @@ use CPAN::DistnameInfo ();
 	    if (!exists $latest_dist{$dist}) {
 		$latest_dist{$dist} = $d;
 	    } else {
-		no warnings;
-		if (eval { version->new($latest_dist{$dist}->version) < version->new($d->version) }) {
+		if (CPAN::Version->vlt($latest_dist{$dist}->version, $d->version)) {
 		    $latest_dist{$dist} = $d;
 		}
 	    }
