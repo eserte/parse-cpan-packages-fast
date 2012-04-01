@@ -1,5 +1,9 @@
 Revision history for Perl extension Parse::CPAN::Packages::Fast
 
+0.05_53 - changed temporary file handling in fast module lookup
+	- don't die if package could not be found in fast module lookup
+	- fast module lookup shortcuts as soon as possible
+
 0.05_52 - no code changes, just protecting from test failures
 
 0.05_51 - fast module lookup (experimental)
