@@ -32,4 +32,9 @@ SKIP: {
 	    or diag Dumper($ret);
 	last if $i++>10 && !$do_all;
     }
+
+    {
+	my $ret = Parse::CPAN::Packages::Fast->_module_lookup("This module does not exist", $orig_packages_file, $cache_file);
+	is $ret, undef;
+    }
 }

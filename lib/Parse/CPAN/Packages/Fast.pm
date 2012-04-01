@@ -209,7 +209,8 @@ use CPAN::DistnameInfo ();
 			dist    => $dist,
 		       };
 	    }
-	    die if eof $pwhfh;
+	    return if lc(substr($got, 0, length($skey))) gt lc($skey);
+	    return if eof($pwhfh);
 	}
     }
 	
