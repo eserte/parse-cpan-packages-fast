@@ -5,4 +5,5 @@ MANIFEST			This list of files
 README
 t/basic.t
 t/edge_cases.t
+t/module_lookup.t
 xt/heavy.t

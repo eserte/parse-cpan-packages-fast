@@ -1,5 +1,8 @@
 Revision history for Perl extension Parse::CPAN::Packages::Fast
 
+0.05_51 - fast module lookup (experimental)
+	- new test scripts
+
 0.05_50 - fix for possible hanging test (RT#66555)
 	- use CPAN::Version instead of version.pm
 	  (because is more forgiving) (RT#70577)
