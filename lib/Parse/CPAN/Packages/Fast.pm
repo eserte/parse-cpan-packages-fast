@@ -188,6 +188,59 @@ use CPAN::DistnameInfo ();
 	my @dists = $self->latest_distributions;
 	scalar @dists;
     }
+
+    # Addition: fast module lookup without loading whole packages file
+    # Not yet official!
+    sub _module_lookup {
+	die "Usage?" if @_ != 4;
+	my($class, $module, $orig_packages_file, $cache_file) = @_;
+	require Search::Dict;
+	my $pwhfh = $class->_get_plain_packages_fh($orig_packages_file, $cache_file);
+	my $skey = "$module ";
+	return if Search::Dict::look($pwhfh, $skey, 0, 1) == -1;
+	while () {
+	    my $got = <$pwhfh>;
+	    if (index($got, $skey) == 0) {
+		chomp $got;
+		my($pkg, $ver, $dist) = split /\s+/, $got;
+		return {
+			package => $pkg,
+			version => $ver,
+			dist    => $dist,
+		       };
+	    }
+	    die if eof $pwhfh;
+	}
+    }
+	
+    sub _get_plain_packages_fh {
+	die "Usage?" if @_ != 3;
+	my(undef, $orig_packages_file, $cache_file) = @_;
+	die "$orig_packages_file does not exist" if !-e $orig_packages_file;
+	if (!-e $cache_file || -M $cache_file > -M $orig_packages_file) {
+	    open my $ifh, "<:gzip", $orig_packages_file
+		or die "Can't open $orig_packages_file: $!";
+	    open my $ofh, ">", "$cache_file.$$"
+		or die "Can't write to $cache_file.$$: $!";
+	    while (<$ifh>) {
+		last if /^$/;
+	    }
+	    {
+		local $/ = \8192;
+		while (<$ifh>) {
+		    print $ofh $_;
+		}
+	    }
+	    close $ofh
+		or die "Error while writing $cache_file.$$: $!";
+	    rename "$cache_file.$$", $cache_file
+		or die "While renaming $cache_file.$$ to $cache_file: $!";
+	}
+	open my $fh, $cache_file
+	    or die "Can't open $cache_file: $!";
+	$fh;
+    }
+	
 }
 
 ######################################################################
