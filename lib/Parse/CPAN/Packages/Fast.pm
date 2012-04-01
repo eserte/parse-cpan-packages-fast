@@ -220,21 +220,23 @@ use CPAN::DistnameInfo ();
 	if (!-e $cache_file || -M $cache_file > -M $orig_packages_file) {
 	    open my $ifh, "<:gzip", $orig_packages_file
 		or die "Can't open $orig_packages_file: $!";
-	    open my $ofh, ">", "$cache_file.$$"
-		or die "Can't write to $cache_file.$$: $!";
+	    require File::Temp;
+	    require File::Basename;
+	    my($tmpfh,$tmpfile) = File::Temp::tempfile(DIR => File::Basename::dirname($cache_file))
+		or die "Can't create temporary file: $!";
 	    while (<$ifh>) {
 		last if /^$/;
 	    }
 	    {
 		local $/ = \8192;
 		while (<$ifh>) {
-		    print $ofh $_;
+		    print $tmpfh $_;
 		}
 	    }
-	    close $ofh
-		or die "Error while writing $cache_file.$$: $!";
-	    rename "$cache_file.$$", $cache_file
-		or die "While renaming $cache_file.$$ to $cache_file: $!";
+	    close $tmpfh
+		or die "Error while writing temporary file $tmpfile: $!";
+	    rename $tmpfile, $cache_file
+		or die "While renaming $tmpfile to $cache_file: $!";
 	}
 	open my $fh, $cache_file
 	    or die "Can't open $cache_file: $!";
