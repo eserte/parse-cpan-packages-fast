@@ -1,17 +1,24 @@
 #!/usr/bin/env perl
 
 use strict;
+use FindBin;
+use lib $FindBin::RealBin;
+
 use Test::More;
+
+use TestUtil;
 
 my $real_tests = 15;
 plan tests => 1 + $real_tests;
 
 use_ok 'Parse::CPAN::Packages::Fast';
 
-my $packages_file = eval { Parse::CPAN::Packages::Fast->_default_packages_file_batch };
+my $packages_file = my_default_packages_file;
 SKIP: {
-    skip "Cannot get default CPAN packages index file", $real_tests
-	if !-r $packages_file || -z $packages_file;
+    if (!$packages_file) {
+	diag "INFO: Can't get default packages file";
+	skip "Cannot get default CPAN packages index file", $real_tests;
+    }	
 
     my $pcp = Parse::CPAN::Packages::Fast->new;
     isa_ok($pcp, 'Parse::CPAN::Packages::Fast');

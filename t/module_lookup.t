@@ -1,11 +1,16 @@
 #!/usr/bin/perl
 
 use strict;
+use FindBin;
+use lib $FindBin::RealBin;
+
 use Data::Dumper;
 use File::Temp qw(tempfile);
 use Getopt::Long;
 use Parse::CPAN::Packages::Fast;
 use Test::More 'no_plan';
+
+use TestUtil;
 
 my $do_all;
 GetOptions("a|all" => \$do_all)
@@ -14,10 +19,10 @@ GetOptions("a|all" => \$do_all)
 my($tmpfh, $cache_file) = tempfile(UNLINK => 1)
     or die $!;
 utime 0, 0, $cache_file; # so the modtime check of _get_plain_packages_fh works
-my $orig_packages_file = eval { Parse::CPAN::Packages::Fast->_default_packages_file_batch };
+my $orig_packages_file = my_default_packages_file;
 SKIP: {
     skip "Cannot get default CPAN packages index file", 1
-	if !$orig_packages_file || !-r $orig_packages_file || -z $orig_packages_file;
+	if !$orig_packages_file;
 
     my $pcpf = Parse::CPAN::Packages::Fast->new;
     my $i = 0;
