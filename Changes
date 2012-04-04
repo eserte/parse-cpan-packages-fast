@@ -1,5 +1,7 @@
 Revision history for Perl extension Parse::CPAN::Packages::Fast
 
+0.05_52 - no code changes, just protecting from test failures
+
 0.05_51 - fast module lookup (experimental)
 	- new test scripts
 
