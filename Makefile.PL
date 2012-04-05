@@ -23,3 +23,13 @@ WriteMakefile(NAME => 'Parse::CPAN::Packages::Fast',
 	      ($eumm_recent_enough ?
 	       (META_ADD => { resources => { repository => 'git://github.com/eserte/parse-cpan-packages-fast.git' } }) : ()),
 	     );
+
+sub MY::postamble {
+    <<'EOF'
+authdisttest : distdir
+	cd $(DISTVNAME) && $(ABSPERLRUN) Makefile.PL 
+	cd $(DISTVNAME) && $(MAKE) $(PASTHRU)
+	cd $(DISTVNAME) && env PERL_AUTHOR_TEST=1 $(MAKE) test $(PASTHRU)
+
+EOF
+}
