@@ -46,9 +46,11 @@ use CPAN::DistnameInfo ();
     sub _default_packages_file_batch {
 	my($class) = @_;
 
-	my $home_cpandir = "$ENV{HOME}/.cpan";
-	if (!$INC{"CPAN/MyConfig.pm"}) {
+	my $home_cpandir = do {
 	    no warnings 'uninitialized'; # HOME may be uninitialized on some systems e.g. Windows
+	    "$ENV{HOME}/.cpan";
+	};
+	if (!$INC{"CPAN/MyConfig.pm"}) {
 	    my $home_myconfig = "$home_cpandir/CPAN/MyConfig.pm";
 	    if (-r $home_myconfig) {
 		local @INC = ($home_cpandir);
@@ -56,7 +58,10 @@ use CPAN::DistnameInfo ();
 	    }
 	}
 	if ($INC{"CPAN/MyConfig.pm"} && $CPAN::Config->{keep_source_where}) {
-	    return $CPAN::Config->{keep_source_where} . "/modules/02packages.details.txt.gz";
+	    my $packages_file = $CPAN::Config->{keep_source_where} . "/modules/02packages.details.txt.gz";
+	    if (-r $packages_file && -s $packages_file) {
+		return $packages_file;
+	    }
 	}
 
 	# Cannot find a usable CPAN::MyConfig, try a default location
