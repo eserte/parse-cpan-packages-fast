@@ -20,7 +20,7 @@ SKIP: {
 	skip "Cannot get default CPAN packages index file", $real_tests;
     }	
 
-    my $pcp = Parse::CPAN::Packages::Fast->new;
+    my $pcp = Parse::CPAN::Packages::Fast->new($packages_file);
     isa_ok($pcp, 'Parse::CPAN::Packages::Fast');
 
     cmp_ok($pcp->package_count, ">", 10000);

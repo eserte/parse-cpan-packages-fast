@@ -24,7 +24,7 @@ SKIP: {
     skip "Cannot get default CPAN packages index file", 1
 	if !$orig_packages_file;
 
-    my $pcpf = Parse::CPAN::Packages::Fast->new;
+    my $pcpf = Parse::CPAN::Packages::Fast->new($orig_packages_file);
     my $i = 0;
     for my $package ($pcpf->packages) {
 	my $ret = Parse::CPAN::Packages::Fast->_module_lookup($package, $orig_packages_file, $cache_file);
