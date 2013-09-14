@@ -1,5 +1,7 @@
 Revision history for Perl extension Parse::CPAN::Packages::Fast
 
+0.06_51 - another test patch for tempfile problems under cygwin
+
 0.06_50 - a test patch for possible hanging test (RT #66555, again)
 
 0.06	- minor _default_packages_file_batch improvements
