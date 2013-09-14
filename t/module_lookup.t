@@ -18,6 +18,7 @@ GetOptions("a|all" => \$do_all)
 
 my($tmpfh, $cache_file) = tempfile(UNLINK => 1)
     or die $!;
+close $tmpfh;
 utime 0, 0, $cache_file; # so the modtime check of _get_plain_packages_fh works
 my $orig_packages_file = my_default_packages_file;
 SKIP: {
