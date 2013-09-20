@@ -19,7 +19,7 @@ WriteMakefile(NAME => 'Parse::CPAN::Packages::Fast',
 	      VERSION_FROM => 'lib/Parse/CPAN/Packages/Fast.pm',
 	      PREREQ_PM => { 'CPAN::Version'      => 0,
 			     'CPAN::DistnameInfo' => 0,
-			     'PerlIO::gzip'       => 0,
+			     'IO::Uncompress::Gunzip' => 0,
 			   },
 	      ($eumm_recent_enough ?
 	       (META_ADD => { resources => { repository => 'git://github.com/eserte/parse-cpan-packages-fast.git' } }) : ()),

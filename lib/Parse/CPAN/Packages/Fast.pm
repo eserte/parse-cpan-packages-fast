@@ -22,10 +22,10 @@ use CPAN::DistnameInfo ();
 {
     package Parse::CPAN::Packages::Fast;
 
-    our $VERSION = '0.06_51';
+    our $VERSION = '0.06_52';
     $VERSION =~ s{_}{};
 
-    use PerlIO::gzip;
+    use IO::Uncompress::Gunzip qw($GunzipError);
     use CPAN::Version ();
 
     # Note: this function is possibly interactive, i.e. if CPAN.pm was
@@ -89,8 +89,8 @@ use CPAN::DistnameInfo ();
 	my %dist_to_pkgs;
 	my %pkg_ver;
 
-	open my $FH, "<:gzip", $packages_file
-	    or die "Can't open $packages_file: $!";
+	my $FH = IO::Uncompress::Gunzip->new($packages_file)
+	    or die "Can't open $packages_file: $GunzipError";
 	# overread header
 	while(<$FH>) {
 	    last if /^$/;
@@ -224,8 +224,8 @@ use CPAN::DistnameInfo ();
 	my(undef, $orig_packages_file, $cache_file) = @_;
 	die "$orig_packages_file does not exist" if !-e $orig_packages_file;
 	if (!-e $cache_file || -M $cache_file > -M $orig_packages_file) {
-	    open my $ifh, "<:gzip", $orig_packages_file
-		or die "Can't open $orig_packages_file: $!";
+	    my $ifh = IO::Uncompress::Gunzip->new($orig_packages_file)
+		or die "Can't open $orig_packages_file: $GunzipError";
 	    require File::Temp;
 	    require File::Basename;
 	    my($tmpfh,$tmpfile) = File::Temp::tempfile(DIR => File::Basename::dirname($cache_file))
