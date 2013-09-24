@@ -22,7 +22,7 @@ use CPAN::DistnameInfo ();
 {
     package Parse::CPAN::Packages::Fast;
 
-    our $VERSION = '0.06_52';
+    our $VERSION = '0.07';
     $VERSION =~ s{_}{};
 
     use IO::Uncompress::Gunzip qw($GunzipError);
