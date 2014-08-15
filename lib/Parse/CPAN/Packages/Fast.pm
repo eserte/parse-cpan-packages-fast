@@ -4,7 +4,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2009,2010,2012,2013 Slaven Rezic. All rights reserved.
+# Copyright (C) 2009,2010,2012,2013,2014 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -22,7 +22,7 @@ use CPAN::DistnameInfo ();
 {
     package Parse::CPAN::Packages::Fast;
 
-    our $VERSION = '0.07';
+    our $VERSION = '0.08';
     $VERSION =~ s{_}{};
 
     use IO::Uncompress::Gunzip qw($GunzipError);
@@ -54,7 +54,7 @@ use CPAN::DistnameInfo ();
 	    my $home_myconfig = "$home_cpandir/CPAN/MyConfig.pm";
 	    if (-r $home_myconfig) {
 		local @INC = ($home_cpandir);
-		eval { require "CPAN::MyConfig" };
+		eval { require CPAN::MyConfig };
 	    }
 	}
 	if ($INC{"CPAN/MyConfig.pm"} && $CPAN::Config->{keep_source_where}) {
