@@ -1,0 +1,26 @@
+language: perl
+before_install:
+ - test "$TEST_WITH_PACKAGES" = "yes" && (cd /home/travis && mkdir -p .cpan/sources/modules && cd .cpan/sources/modules && wget http://cpan.cpantesters.org/modules/02packages.details.txt.gz) || true
+ - test "$TEST_WITH_MYCONFIG" = "yes" && (cd /home/travis && mkdir -p .cpan/CPAN && echo '$CPAN::Config = { keep_source_where => q[/home/travis/.cpan/sources] }; 1; ' > .cpan/CPAN/MyConfig.pm) || true
+matrix:
+ include:
+  - perl: "5.20"
+    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+  - perl: "5.18"
+    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+  - perl: "5.16"
+    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+  - perl: "5.16"
+    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=no
+  - perl: "5.16"
+    env: TEST_WITH_PACKAGES=no TEST_WITH_MYCONFIG=yes
+  - perl: "5.16"
+    env: TEST_WITH_PACKAGES=no TEST_WITH_MYCONFIG=no
+  - perl: "5.14"
+    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+  - perl: "5.12"
+    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+  - perl: "5.10"
+    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+  - perl: "5.8"
+    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
