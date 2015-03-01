@@ -205,6 +205,7 @@ use CPAN::DistnameInfo ();
 	return if Search::Dict::look($pwhfh, $skey, 0, 1) == -1;
 	while () {
 	    my $got = <$pwhfh>;
+	    last unless $got;
 	    if (index($got, $skey) == 0) {
 		chomp $got;
 		my($pkg, $ver, $dist) = split /\s+/, $got;
