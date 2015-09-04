@@ -24,3 +24,4 @@ matrix:
     env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
   - perl: "5.8"
     env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+sudo: false
