@@ -4,7 +4,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2009,2010,2012,2013,2014 Slaven Rezic. All rights reserved.
+# Copyright (C) 2009,2010,2012,2013,2014,2015 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -22,7 +22,7 @@ use CPAN::DistnameInfo ();
 {
     package Parse::CPAN::Packages::Fast;
 
-    our $VERSION = '0.08';
+    our $VERSION = '0.08_50';
     $VERSION =~ s{_}{};
 
     use IO::Uncompress::Gunzip qw($GunzipError);
@@ -89,8 +89,14 @@ use CPAN::DistnameInfo ();
 	my %dist_to_pkgs;
 	my %pkg_ver;
 
-	my $FH = IO::Uncompress::Gunzip->new($packages_file)
-	    or die "Can't open $packages_file: $GunzipError";
+	my $FH;
+	if ($packages_file !~ m{\.gz$}) { # assume uncompressed file
+	    open $FH, '<', $packages_file
+		or die "Can't open $packages_file: $!";
+	} else {
+	    $FH = IO::Uncompress::Gunzip->new($packages_file)
+		or die "Can't open $packages_file: $GunzipError";
+	}
 	# overread header
 	while(<$FH>) {
 	    last if /^$/;

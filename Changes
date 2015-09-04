@@ -1,5 +1,7 @@
 Revision history for Perl extension Parse::CPAN::Packages::Fast
 
+0.08_50 - allow also reading an uncompressed 02packages.details.txt file
+
 0.08    - fix in private function _default_packages_file_batch
 	- configuration file for travis-ci
 
