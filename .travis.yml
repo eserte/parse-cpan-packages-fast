@@ -1,9 +1,8 @@
 language: perl
-before_install:
- - test "$TEST_WITH_PACKAGES" = "yes" && (cd /home/travis && mkdir -p .cpan/sources/modules && cd .cpan/sources/modules && wget https://cpan.metacpan.org/modules/02packages.details.txt.gz) || true
- - test "$TEST_WITH_MYCONFIG" = "yes" && (cd /home/travis && mkdir -p .cpan/CPAN && echo '$CPAN::Config = { keep_source_where => q[/home/travis/.cpan/sources] }; 1; ' > .cpan/CPAN/MyConfig.pm) || true
 matrix:
  include:
+  - perl: "5.22"
+    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
   - perl: "5.20"
     env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
   - perl: "5.18"
@@ -24,4 +23,12 @@ matrix:
     env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
   - perl: "5.8"
     env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+
+before_install:
+ - test "$TEST_WITH_PACKAGES" = "yes" && (cd /home/travis && mkdir -p .cpan/sources/modules && cd .cpan/sources/modules && wget https://cpan.metacpan.org/modules/02packages.details.txt.gz) || true
+ - test "$TEST_WITH_MYCONFIG" = "yes" && (cd /home/travis && mkdir -p .cpan/CPAN && echo '$CPAN::Config = { keep_source_where => q[/home/travis/.cpan/sources] }; 1; ' > .cpan/CPAN/MyConfig.pm) || true
+
+branches:
+ except:
+  - /appveyor/
 sudo: false
