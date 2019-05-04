@@ -11,12 +11,18 @@ use Test::More 'no_plan';
 
 use Parse::CPAN::Packages::Fast;
 
-{
-    my $p = create_test_object(<<EOF);
+my $p = create_test_object(<<EOF);
 Kwalify                            1.20something  S/SR/SREZIC/Kwalify-1.20something.tar.gz
 Kwalify                            1.21  S/SR/SREZIC/Kwalify-1.21.tar.gz
 EOF
-    is $p->latest_distribution('Kwalify')->version, '1.21', 'Can deal with non-numeric versions';
+
+is $p->latest_distribution('Kwalify')->version, '1.21', 'Can deal with non-numeric versions';
+
+{
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+    is $p->latest_distribution(undef), undef;
+    is_deeply \@warnings, [], 'no warnings';
 }
 
 sub create_test_object {

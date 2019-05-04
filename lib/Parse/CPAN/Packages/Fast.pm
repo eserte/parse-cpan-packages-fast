@@ -150,6 +150,7 @@ use CPAN::DistnameInfo ();
 
     sub latest_distribution {
 	my($self, $distribution_name) = @_;
+	return undef if !defined $distribution_name;
 	my @candidates;
 	for my $candidate (keys %{ $self->{dist_to_pkgs} }) {
 	    if ($candidate =~ m{^./../.*/\Q$distribution_name}) {
