@@ -1,28 +1,42 @@
 language: perl
 matrix:
  include:
+  - perl: "5.30"
+    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+    dist: xenial
+  - perl: "5.28"
+    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=no
+    dist: xenial
+  - perl: "5.26"
+    env: TEST_WITH_PACKAGES=no TEST_WITH_MYCONFIG=yes
+    dist: xenial
+  - perl: "5.24"
+    env: TEST_WITH_PACKAGES=no TEST_WITH_MYCONFIG=no
+    dist: xenial
   - perl: "5.22"
     env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+    dist: xenial
   - perl: "5.20"
     env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+    dist: trusty
   - perl: "5.18"
     env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
-  - perl: "5.16"
-    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
-  - perl: "5.16"
-    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=no
-  - perl: "5.16"
-    env: TEST_WITH_PACKAGES=no TEST_WITH_MYCONFIG=yes
+    dist: trusty
   - perl: "5.16"
     env: TEST_WITH_PACKAGES=no TEST_WITH_MYCONFIG=no
+    dist: trusty
   - perl: "5.14"
     env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+    dist: trusty
   - perl: "5.12"
     env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+    dist: trusty
   - perl: "5.10"
     env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+    dist: trusty
   - perl: "5.8"
     env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+    dist: trusty
 
 before_install:
  - test "$TEST_WITH_PACKAGES" = "yes" && (cd /home/travis && mkdir -p .cpan/sources/modules && cd .cpan/sources/modules && wget https://cpan.metacpan.org/modules/02packages.details.txt.gz) || true
