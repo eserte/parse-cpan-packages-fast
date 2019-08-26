@@ -1,0 +1,23 @@
+branches:
+  except:
+    - /travis/
+skip_tags: true
+
+environment:
+  matrix:
+    - perl: activeperl
+      make: dmake
+    - perl: strawberryperl
+      make: gmake
+
+install:
+  - if %perl%==strawberryperl ( if not exist "C:\strawberry" cinst strawberryperl )
+  - if %perl%==strawberryperl   set PATH=C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
+  - if not %perl%==cygwinperl perl -v
+  - cd C:\projects\%APPVEYOR_PROJECT_NAME%
+  - if %perl%==activeperl       ppm install dmake CPAN-DistnameInfo
+  - if %perl%==strawberryperl   cpanm --installdeps .
+
+build_script:
+  - perl Makefile.PL
+  - '%make% test'
