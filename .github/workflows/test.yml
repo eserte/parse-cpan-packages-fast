@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches-ignore:
+      - '*travis*'
+      - '*appveyor*'
+      - '*doozer*'
+  pull_request:
+
+jobs:
+  test:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os:             'ubuntu-20.04'
+          - os:             'ubuntu-18.04'
+          - os:             'ubuntu-16.04'
+
+    steps:
+    - name: apt hacks
+      # removing non-needed apt repositories may speed up "apt-get update"
+      # also, 3rd party repositories might be unreliable
+      run: |
+        sudo rm -f /etc/apt/sources.list.d/*.list
+        sudo apt-get update -qq
+      if: "startsWith(matrix.os, 'ubuntu-')"
+    - uses: actions/checkout@v2
+    - name: Preinstall, Configure, Build and Test
+      env:
+        HARNESS_TIMER:   1
+        HARNESS_OPTIONS: j8
+      run: |
+        sudo apt-get install -qq --no-install-recommends cpanminus
+        cpanm --sudo --quiet --installdeps --notest . || ( cat /github/home/.cpanm/work/*/build.log; false )
+        perl Makefile.PL
+        make -j8
+        make test
+      if: "!startsWith(matrix.os,'windows-')"
+
+  test_in_container:
+    name: Test with perl ${{ matrix.perlimage }}
+    runs-on: ubuntu-latest
+    container: perl:${{ matrix.perlimage }}
+    strategy:
+      matrix:
+        include:
+          - perlimage: 5.8.9-threaded-stretch
+          - perlimage: 5.10.1-buster
+          - perlimage: 5.12.5-stretch
+          - perlimage: 5.14.4-stretch
+          - perlimage: 5.16.3-buster
+          - perlimage: 5.18.4-buster
+          - perlimage: 5.22.4-stretch
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Preinstall, Configure, Build and Test
+      env:
+        HARNESS_TIMER:   1
+        HARNESS_OPTIONS: j8
+      run: |
+        cpanm --quiet --installdeps --notest . || ( cat /github/home/.cpanm/work/*/build.log; false )
+        perl Makefile.PL
+        make -j8
+        make test
