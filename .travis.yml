@@ -1,42 +1,59 @@
 language: perl
+arch:
+ - arm64
 matrix:
  include:
-  - perl: "5.30"
-    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
-    dist: xenial
-  - perl: "5.28"
-    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=no
-    dist: xenial
-  - perl: "5.26"
+  - dist: xenial
+    perl: 5.24
     env: TEST_WITH_PACKAGES=no TEST_WITH_MYCONFIG=yes
-    dist: xenial
-  - perl: "5.24"
+  - dist: bionic
+    perl: 5.26
+    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=no
+  - dist: focal
+    perl: 5.32
+    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+  - dist: focal
+    perl: 5.32
     env: TEST_WITH_PACKAGES=no TEST_WITH_MYCONFIG=no
-    dist: xenial
-  - perl: "5.22"
-    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
-    dist: xenial
-  - perl: "5.20"
-    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
-    dist: trusty
-  - perl: "5.18"
-    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
-    dist: trusty
-  - perl: "5.16"
-    env: TEST_WITH_PACKAGES=no TEST_WITH_MYCONFIG=no
-    dist: trusty
-  - perl: "5.14"
-    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
-    dist: trusty
-  - perl: "5.12"
-    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
-    dist: trusty
-  - perl: "5.10"
-    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
-    dist: trusty
-  - perl: "5.8"
-    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
-    dist: trusty
+#matrix:
+# include:
+#  - perl: "5.30"
+#    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+#    dist: xenial
+#  - perl: "5.28"
+#    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=no
+#    dist: xenial
+#  - perl: "5.26"
+#    env: TEST_WITH_PACKAGES=no TEST_WITH_MYCONFIG=yes
+#    dist: xenial
+#  - perl: "5.24"
+#    env: TEST_WITH_PACKAGES=no TEST_WITH_MYCONFIG=no
+#    dist: xenial
+#  - perl: "5.22"
+#    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+#    dist: xenial
+#  - perl: "5.20"
+#    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+#    dist: trusty
+#  - perl: "5.18"
+#    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+#    dist: trusty
+#  - perl: "5.16"
+#    env: TEST_WITH_PACKAGES=no TEST_WITH_MYCONFIG=no
+#    dist: trusty
+#  - perl: "5.14"
+#    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+#    dist: trusty
+#  - perl: "5.12"
+#    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+#    dist: trusty
+#  - perl: "5.10"
+#    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+#    dist: trusty
+#  - perl: "5.8"
+#    env: TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes
+#    dist: trusty
+#sudo: false
 
 before_install:
  - test "$TEST_WITH_PACKAGES" = "yes" && (cd /home/travis && mkdir -p .cpan/sources/modules && cd .cpan/sources/modules && wget https://cpan.metacpan.org/modules/02packages.details.txt.gz) || true
@@ -48,4 +65,5 @@ before_script:
 branches:
  except:
   - /appveyor/
-sudo: false
+  - /github-actions/
+  - /doozer/
