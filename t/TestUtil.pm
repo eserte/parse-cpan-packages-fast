@@ -3,6 +3,7 @@
 package TestUtil;
 
 use strict;
+use warnings 'FATAL', 'all';
 use Exporter 'import';
 
 our @EXPORT = qw(my_default_packages_file);

@@ -1,4 +1,5 @@
 use strict;
+use warnings 'FATAL', 'all';
 use FindBin;
 use lib $FindBin::RealBin;
 
