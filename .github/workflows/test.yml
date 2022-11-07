@@ -26,7 +26,7 @@ jobs:
         sudo rm -f /etc/apt/sources.list.d/*.list
         sudo apt-get update -qq
       if: "startsWith(matrix.os, 'ubuntu-')"
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Preinstall, Configure, Build and Test
       env:
         HARNESS_TIMER:   1
@@ -55,7 +55,7 @@ jobs:
           - perlimage: 5.22.4-stretch
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Preinstall, Configure, Build and Test
       env:
         HARNESS_TIMER:   1
