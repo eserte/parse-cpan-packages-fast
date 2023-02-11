@@ -33,7 +33,7 @@ jobs:
         HARNESS_OPTIONS: j8
       run: |
         sudo apt-get install -qq --no-install-recommends cpanminus
-        cpanm --sudo --quiet --installdeps --notest . || ( cat /github/home/.cpanm/work/*/build.log; false )
+        cpanm --sudo --quiet --installdeps --notest . || ( cat ~/.cpanm/work/*/build.log; false )
         perl Makefile.PL
         make -j8
         make test
@@ -61,7 +61,7 @@ jobs:
         HARNESS_TIMER:   1
         HARNESS_OPTIONS: j8
       run: |
-        cpanm --quiet --installdeps --notest . || ( cat /github/home/.cpanm/work/*/build.log; false )
+        cpanm --quiet --installdeps --notest . || ( cat ~/.cpanm/work/*/build.log; false )
         perl Makefile.PL
         make -j8
         make test
