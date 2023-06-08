@@ -30,13 +30,13 @@ SKIP: {
     my $i = 0;
     for my $package ($pcpf->packages) {
 	my $ret = Parse::CPAN::Packages::Fast->_module_lookup($package, $orig_packages_file, $cache_file);
-	is $ret->{package}, $package
+	is $ret->{package}, $package, "Module lookup: $package found."
 	    or diag Dumper($ret);
 	last if $i++>10 && !$do_all;
     }
 
     {
 	my $ret = Parse::CPAN::Packages::Fast->_module_lookup("This module does not exist", $orig_packages_file, $cache_file);
-	is $ret, undef;
+	is $ret, undef, 'Non-existent module does not exist.';
     }
 }
