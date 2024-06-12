@@ -7,8 +7,9 @@ skip_tags: true
 
 environment:
   matrix:
-    - perl: activeperl
-      make: dmake
+## ppm downloads do not work anymore, since beginning of June 2024
+#    - perl: activeperl
+#      make: dmake
     - perl: strawberryperl
       make: gmake
 
