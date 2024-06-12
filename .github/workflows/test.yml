@@ -41,7 +41,7 @@ jobs:
       if: "!startsWith(matrix.os,'windows-')"
 
   test_in_container:
-    name: Test with perl ${{ matrix.perlimage }}
+    name: Test with perl ${{ matrix.perlimage }} ${{ matrix.label }}
     runs-on: ubuntu-latest
     container: perl:${{ matrix.perlimage }}
     strategy:
@@ -54,14 +54,35 @@ jobs:
           - perlimage: 5.16.3-buster
           - perlimage: 5.18.4-buster
           - perlimage: 5.22.4-stretch
-
+          - perlimage: 5.24.4-threaded-buster
+            TEST_WITH_PACKAGES: no
+            TEST_WITH_MYCONFIG: yes
+            label: "TEST_WITH_PACKAGES=no TEST_WITH_MYCONFIG=yes"
+          - perlimage: 5.26.3-buster
+            TEST_WITH_PACKAGES: yes
+            TEST_WITH_MYCONFIG: no
+            label: "TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=no"
+          - perlimage: 5.32.1-bullseye
+            TEST_WITH_PACKAGES: yes
+            TEST_WITH_MYCONFIG: yes
+            label: "TEST_WITH_PACKAGES=yes TEST_WITH_MYCONFIG=yes"
+          - perlimage: 5.34.3-bullseye
+            TEST_WITH_PACKAGES: no
+            TEST_WITH_MYCONFIG: no
+            label: "TEST_WITH_PACKAGES=no TEST_WITH_MYCONFIG=no"
+          - perlimage: 5.40.0-slim-bookworm
+            
     steps:
     - uses: actions/checkout@v3
     - name: Preinstall, Configure, Build and Test
       env:
         HARNESS_TIMER:   1
         HARNESS_OPTIONS: j8
+        TEST_WITH_PACKAGES: ${{ matrix.TEST_WITH_PACKAGES }}
+        TEST_WITH_MYCONFIG: ${{ matrix.TEST_WITH_MYCONFIG }}
       run: |
+        test "$TEST_WITH_PACKAGES" = "yes" && (cd $HOME && mkdir -p .cpan/sources/modules && cd .cpan/sources/modules && wget https://cpan.metacpan.org/modules/02packages.details.txt.gz) || true
+        test "$TEST_WITH_MYCONFIG" = "yes" && (cd $HOME && mkdir -p .cpan/CPAN && echo '$CPAN::Config = { keep_source_where => q[/home/travis/.cpan/sources] }; 1; ' > .cpan/CPAN/MyConfig.pm) || true
         cpanm --quiet --installdeps --notest . || ( cat ~/.cpanm/work/*/build.log; false )
         perl Makefile.PL
         make -j8
