@@ -16,8 +16,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - os:             'ubuntu-20.04'
-          - os:             'ubuntu-22.04'
+          - os: 'ubuntu-20.04'
+          - os: 'ubuntu-22.04'
+          - os: 'ubuntu-24.04'
 
     steps:
     - name: apt hacks
@@ -27,7 +28,7 @@ jobs:
         sudo rm -f /etc/apt/sources.list.d/*.list
         sudo apt-get update -qq
       if: "startsWith(matrix.os, 'ubuntu-')"
-    - uses: actions/checkout@v3
+    - uses: taiki-e/checkout-action@v1
     - name: Preinstall, Configure, Build and Test
       env:
         HARNESS_TIMER:   1
@@ -73,7 +74,18 @@ jobs:
           - perlimage: 5.40.0-slim-bookworm
             
     steps:
-    - uses: actions/checkout@v3
+    - name: apt hacks
+      run: |
+        set -e
+        CODENAME=$(perl -nle '/^VERSION_CODENAME="?([^"]+)/ and $codename=$1; /^VERSION="\d+ \((.*)\)/ and $maybe_codename=$1; END { print $codename || $maybe_codename }' /etc/os-release)
+        case "$CODENAME" in
+          wheezy|jessie|stretch)
+            echo "APT::Get::AllowUnauthenticated 1;" > /etc/apt/apt.conf.d/02allow-unsigned
+            echo "deb [check-valid-until=no] http://archive.debian.org/debian $CODENAME main"                   >  /etc/apt/sources.list
+            echo "deb [check-valid-until=no] http://archive.debian.org/debian-security/ $CODENAME/updates main" >> /etc/apt/sources.list
+            ;;
+        esac
+    - uses: taiki-e/checkout-action@v1
     - name: Preinstall, Configure, Build and Test
       env:
         HARNESS_TIMER:   1
