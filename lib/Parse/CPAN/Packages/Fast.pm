@@ -4,12 +4,11 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2009,2010,2012,2013,2014,2015 Slaven Rezic. All rights reserved.
+# Copyright (C) 2009,2010,2012,2013,2014,2015,2024 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
-# Mail: slaven@rezic.de
-# WWW:  http://www.rezic.de/eserte/
+# WWW:  https://github.com/eserte/parse-cpan-packages-fast
 #
 
 use strict;
@@ -22,7 +21,7 @@ use CPAN::DistnameInfo ();
 {
     package Parse::CPAN::Packages::Fast;
 
-    our $VERSION = '0.09';
+    our $VERSION = '0.09_50';
     $VERSION =~ s{_}{};
 
     use IO::Uncompress::Gunzip qw($GunzipError);
