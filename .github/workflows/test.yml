@@ -78,7 +78,7 @@ jobs:
         set -e
         CODENAME=$(perl -nle '/^VERSION_CODENAME="?([^"]+)/ and $codename=$1; /^VERSION="\d+ \((.*)\)/ and $maybe_codename=$1; END { print $codename || $maybe_codename }' /etc/os-release)
         case "$CODENAME" in
-          wheezy|jessie|stretch)
+          wheezy|jessie|stretch|buster)
             echo "APT::Get::AllowUnauthenticated 1;" > /etc/apt/apt.conf.d/02allow-unsigned
             echo "deb [check-valid-until=no] http://archive.debian.org/debian $CODENAME main"                   >  /etc/apt/sources.list
             echo "deb [check-valid-until=no] http://archive.debian.org/debian-security/ $CODENAME/updates main" >> /etc/apt/sources.list
