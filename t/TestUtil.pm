@@ -5,6 +5,7 @@ package TestUtil;
 use strict;
 use warnings 'FATAL', 'all';
 use Exporter 'import';
+use Cwd;
 
 our @EXPORT = qw(my_default_packages_file);
 
@@ -13,7 +14,7 @@ sub my_default_packages_file {
 	return Parse::CPAN::Packages::Fast->_default_packages_file_interactive;
     }
 
-    my $packages_file = eval { Parse::CPAN::Packages::Fast->_default_packages_file_batch };
+    my $packages_file = getcwd() . '/t/02packages.details.txt.gz';
     return undef if $packages_file && (!-r $packages_file || -z $packages_file);
     $packages_file;
 }
